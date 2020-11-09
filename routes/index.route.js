@@ -3,7 +3,7 @@ const express = require('express')
 const rootRouter = express.Router()
 //----------------------------------------------------------
 
-const nguoidung = require('./nguoidung.route')
+//const nguoidung = require('./nguoidung.route')
 const cauhoi = require('./cauhoi.route')
 const loaicauhoi = require('./loaicauhoi.route')
 const bailam = require('./bailam.route')
@@ -15,7 +15,7 @@ const phieudangki = require('./phieudangki.route')
 const mon = require('./mon.route')
 //----------------------------------------------------------
 
-rootRouter.use('/api/nguoidung', nguoidung)
+//rootRouter.use('/api/nguoidung', nguoidung)
 rootRouter.use('/api/cauhoi', cauhoi)
 rootRouter.use('/api/loaicauhoi', loaicauhoi)
 rootRouter.use('/api/bailam', bailam)
