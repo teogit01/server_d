@@ -5,10 +5,27 @@ var Schema = mongoose.Schema
 var schema = new Schema({
 
     ma: String,
-    ten: String,
+    tieude: String,
     noidung: String,
     
-    ma_loai: String,
+    loai:String,
+    phuongan:Array,
+
+    // phuongana: String,
+    // phuonganb: String,
+    // phuonganc: String,
+    // phuongand: String,
+
+    //dapap:String
+
+ 	mon:{
+		type:Schema.Types.ObjectId,
+		ref:"Mon"
+	},
+    dethis:[{
+        type:Schema.Types.ObjectId,
+        ref:"DeThi"
+    }],
 
 	create_at: {
 		type: Date,

@@ -6,10 +6,20 @@ var schema = new Schema({
 
     ma: String,
     ten: String,
-    phieudangki_ma: String,
-    
-    
 
+    khois:[{
+		type:Schema.Types.ObjectId,
+		ref:"Khoi"
+	}],
+	cauhois:[{
+		type:Schema.Types.ObjectId,
+		ref:"Cauhoi"
+	}],
+	dethis:[{
+		type:Schema.Types.ObjectId,
+		ref:"DeThi"
+	}],
+    
 	create_at: {
 		type: Date,
 		default: Date.now

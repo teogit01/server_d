@@ -1,26 +1,26 @@
-var mongoose = require('mongoose')
+// var mongoose = require('mongoose')
 
-var Schema = mongoose.Schema
+// var Schema = mongoose.Schema
 
-var schema = new Schema({
-	tendangnhap: String,
-	matkhau: String,
+// var schema = new Schema({
+// 	tendangnhap: String,
+// 	matkhau: String,
 	
-	hoten: String,
-	gmail: String,
-	sodienthoai: Date,
-	anh: String,
-	diachi: String,
+// 	hoten: String,
+// 	gmail: String,
+// 	sodienthoai: Date,
+// 	anh: String,
+// 	diachi: String,
 
-	id_role: String,
+// 	id_role: String,
 	
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
-})
+// 	create_at: {
+// 		type: Date,
+// 		default: Date.now
+// 	},
+// 	update_at: Date
+// })
 
-var Nguoidung = mongoose.model('Nguoidung', schema)
+// var Nguoidung = mongoose.model('Nguoidung', schema)
 
-module.exports = Nguoidung
+// module.exports = Nguoidung
