@@ -13,6 +13,10 @@ const dapan = require('./dapan.route')
 const cauhoi_phuongan = require('./cauhoi_phuongan.route')
 const phieudangki = require('./phieudangki.route')
 const mon = require('./mon.route')
+const lop = require('./lop.route')
+const khoi = require('./khoi.route')
+const dethi = require('./dethi.route')
+const kithi = require('./kithi.route')
 //----------------------------------------------------------
 
 //rootRouter.use('/api/nguoidung', nguoidung)
@@ -25,6 +29,10 @@ rootRouter.use('/api/dapan', dapan)
 rootRouter.use('/api/cauhoi_phuongan', cauhoi_phuongan)
 rootRouter.use('/api/phieudangki', phieudangki)
 rootRouter.use('/api/mon', mon)
+rootRouter.use('/api/lop', lop)
+rootRouter.use('/api/khoi', khoi)
+rootRouter.use('/api/dethi', dethi)
+rootRouter.use('/api/kithi', kithi)
 
 //----------------------------------------------------------
 module.exports = rootRouter

@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
 
@@ -10,6 +11,7 @@ const connect_db = require('./db')
 const rootRouter = require('./routes/index.route')
 
 const app = express()
+app.use(cors())
 // parse application/x-www-form-urlencoded 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
