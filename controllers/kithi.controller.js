@@ -7,7 +7,7 @@ var shortid = require('shortid');
 const methods = {
 	index: async(req, res)=>{
 		const kithi = await KiThi.find().populate({
-			path:'dethi',
+			path:'dethis',
 			model:'DeThi',
 			populate:{
 				path:'mon',
@@ -41,32 +41,28 @@ const methods = {
 
 	// add ki thi
 	post: async(req, res)=>{
-        let { ma, tieude, dethi, ngay, hocki, batdau, ketthuc } = req.body
-        
-        // let ma = req.body.ma
-        // let ten = req.body.ten
-
+        const { ma, tieude, matkhau ,dethi, ngaythi, hocki, thoigian, mon } = req.body        
 		const kithi = await new KiThi({
             ma: ma,
-            tieude: tieude,
-            dethi: dethi,
-            ngaythi: ngay,
+            tieude: tieude,            
+            matkhau:matkhau,
+            ngaythi: ngaythi,
             hocki: hocki,
-            batdau: batdau,
-            ketthuc: ketthuc,
-            trangthai: 0
+            mon:mon,
+            thoigian:thoigian,
+            trangthai: 0,
 
 		})
-		try{
+		try{			
 			kithi.save().then(async (respone)=>{
+				const p_kithi = await KiThi.findById(respone._id)
+					p_kithi.dethis.push(dethi)
+					p_kithi.save()
 				let p_dethi = await DeThi.findById(dethi)
 				p_dethi.kithis.push(respone._id)
 				p_dethi.save()
 				
-				res.json({
-					result : "success",
-					data: respone
-				})
+				res.send(respone)
 			})			
 		} catch(err){
 			res.json({
@@ -76,12 +72,38 @@ const methods = {
 	},
 	// delete cauhoi (id)
 	destroy: async(req, res)=>{			
+		const {_idkithi} = req.params		
 		try{			
+			const kithi = await KiThi.findById(_idkithi)
+				if(kithi.dethis.length > 0){
+					kithi.dethis.forEach( async item=>{
+						const dethi = await DeThi.findById(item)
+							let newKithis = dethi.kithis.filter(x=> `${x}`!= _idkithi)
+							dethi.kithis = newKithis
+							dethi.save()
+					})
+				}
+				kithi.delete()
 			res.send('ok')
 		}catch(err){
 			res.send(err)
 		}
 		//res.send(user)
+	},
+	themDeThi : async (req, res)=>{
+		try{
+			const {_idkithi, _iddethi} = req.body
+			const dethi = await DeThi.findById(_iddethi)
+				dethi.kithis.push(_idkithi)
+				dethi.save()
+			const kithi = await KiThi.findById(_idkithi)
+				kithi.dethis.push(_iddethi)
+				kithi.save().then(respone =>{					
+					res.send(respone)
+				})					
+		} catch(err){
+			res.send(err)
+		}
 	}
 }
 

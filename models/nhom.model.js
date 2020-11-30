@@ -5,21 +5,23 @@ var Schema = mongoose.Schema
 var schema = new Schema({
 
     ma: String,
-    tieude:String,
-    matkhau:String,
-    ngaythi: String,    
-    hocki: String,    
-    thoigian:Number,    
+    ten:String,      
+    namhoc: String,
+    ghichu: String,
     trangthai: Number,
- 	 	
- 	mon:{
+ 	
+ 	sinhviens:[{
 		type:Schema.Types.ObjectId,
-		ref:"Mon"
-	},
-	dethis:[{
+		ref:"TaiKhoan"
+	}],
+	giaoviens:[{
 		type:Schema.Types.ObjectId,
-		ref:"DeThi"
-	}],	
+		ref:"TaiKhoan"
+	}],
+	thongbaos:[{
+		type:Schema.Types.ObjectId,
+		ref:"ThongBao"
+	}],
     
 	create_at: {
 		type: Date,
@@ -28,6 +30,6 @@ var schema = new Schema({
 	update_at: Date
 })
 
-var KiThi = mongoose.model('KiThi', schema)
+var Nhom = mongoose.model('Nhom', schema)
 
-module.exports = KiThi
+module.exports = Nhom

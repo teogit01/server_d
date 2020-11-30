@@ -4,15 +4,16 @@ var Schema = mongoose.Schema
 
 var schema = new Schema({
 
-    ten: String,    
-    noidung: String,
-    dapan: Boolean,
-
-    cauhoi:{
+    ma: String,        
+    noidung: String,    
+    ngay:String,
+    gio:String,
+ 	 	
+	nhom:{
 		type:Schema.Types.ObjectId,
-		ref:"Cauhoi"
+		ref:"Nhom"
 	},
-	
+    
 	create_at: {
 		type: Date,
 		default: Date.now
@@ -20,6 +21,6 @@ var schema = new Schema({
 	update_at: Date
 })
 
-var PhuongAn = mongoose.model('PhuongAn', schema)
+var ThongBao = mongoose.model('ThongBao', schema)
 
-module.exports = PhuongAn
+module.exports = ThongBao
