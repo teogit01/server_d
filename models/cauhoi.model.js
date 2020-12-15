@@ -9,14 +9,11 @@ var schema = new Schema({
     noidung: String,
     
     loai:String,
-    phuongan:Array,
-
-    // phuongana: String,
-    // phuonganb: String,
-    // phuonganc: String,
-    // phuongand: String,
-
-    //dapap:String
+   
+    phuongans:[{
+        type:Schema.Types.ObjectId,
+        ref:"PhuongAn"
+    }],
 
  	mon:{
 		type:Schema.Types.ObjectId,

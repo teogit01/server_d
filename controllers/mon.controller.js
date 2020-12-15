@@ -5,7 +5,7 @@ var shortid = require('shortid');
 
 const methods = {
 	index: async(req, res)=>{		
-		const mon = await Mon.find()
+		const mon = await Mon.find().populate('cauhois')
 		res.send(mon)
 	},
 	// add mon
