@@ -10,15 +10,17 @@ router.get('/mon/:_idmon', controllers.questionOfSubject)
 //detail 
 router.get('/detail/:id', controllers.detail)
 
-router.get('/de-thi/:id', controllers.questionOfExam)
+router.get('/de-thi/:_iddethi', controllers.cauhoiCuaDethi)
 
-// add cau hoi
-router.post('/', controllers.post)
 // {noi dung, phuongans[]}
-router.post('/them', controllers.addQuestion)
+router.post('/them', controllers.themCauHoi)
 // delete cau  hoi
 router.delete('/:id', controllers.destroy)
+
 router.post('/remove', controllers.removeCauHoi)
+
+// import cau hoi
+router.post('/import', controllers.import)
 
 
 

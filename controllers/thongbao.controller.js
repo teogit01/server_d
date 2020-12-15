@@ -30,10 +30,27 @@ const methods = {
 			thongbao.save().then(async respone=>{
 				const nhom = await Nhom.findById(_idnhom)
 					nhom.thongbaos.push(respone._id)
-					nhom.save()
-			})
-			const thongbaos = await ThongBao.find({'nhom':_idnhom})
-			res.send(thongbaos)
+					nhom.save().then(async ()=>{
+						const thongbaos = await ThongBao.find({'nhom':_idnhom})			
+						res.send(thongbaos)
+					})
+			})			
+		} catch(err){
+			res.send(err)
+		}
+	},	
+	remove : async (req, res) => {
+		// thongbao -> nhom
+		// nhom -> thongbaos
+		try{
+			const {_idnhom, _idthongbao} = req.body
+			const thongbao = await ThongBao.findById(_idthongbao)
+				thongbao.delete()
+			const nhom = await Nhom.findById(_idnhom)			
+				const newThongbaos = nhom.thongbaos.filter(x=> `${x}` != _idthongbao)
+				nhom.thongbaos = newThongbaos
+				nhom.save()
+			res.end()			
 		} catch(err){
 			res.send(err)
 		}

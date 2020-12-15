@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 
 //connect db
 const connect_db = require('./db')
+var path = require('path')
 
 // import Route ------------------------------------------------------------------------
 const rootRouter = require('./routes/index.route')
@@ -24,6 +25,11 @@ app.set('view engine', 'pug')
 
 // Route --------------------------------------------------------------------------------
 app.use('/', rootRouter)
+
+app.get('/api/image/:name',function(req, res){
+	let fileName = req.params.name
+	res.sendFile(path.resolve(`./assets/image/${fileName}`));
+})
 
 app.listen(port,()=>{
 	console.log('Start server port = ', port)

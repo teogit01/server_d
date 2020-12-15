@@ -1,14 +1,16 @@
 let TaiKhoan = require('../models/taikhoan.model')
 let Nhom = require('../models/nhom.model')
+let BaiThi = require('../models/baithi.model')
 const bcrypt = require('bcrypt');
 
+var fs = require ('fs')
 var shortid = require('shortid');
 const saltRounds = 1;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';
 const someOtherPlaintextPassword = 'not_bacon';
 
 const methods = {
-	index: async(req, res)=>{
+	index: async (req, res)=>{
 		const taikhoan = await TaiKhoan.find()
 		res.send(taikhoan)
 	},
@@ -125,7 +127,91 @@ const methods = {
 		} catch(err){
 			res.send(err)
 		}
-	}
+	},
+	doiMatKhau : async (req, res)=>{
+		try{
+			const {user, mkc, mkm, mkm2}=req.body
+			const taikhoan = await TaiKhoan.findById(user._id) 			
+			let check = false	
+				bcrypt.compare(mkc, taikhoan.matkhau).then(function(result) {
+    				check = result
+    				if(check===true){    		
+
+    					bcrypt.hash(mkm, saltRounds).then(async hash=>{
+							//console.log(hash)				
+							taikhoan.matkhau = hash
+							taikhoan.matkhautam = mkm
+							taikhoan.save()
+
+						})			
+
+    					res.send({result:true})
+    				} else {
+    					//return res.send({checked:false,mess:'Wrong Password'})
+    					//res.send(check)
+    					res.send({result:false})
+    				}
+    			})
+			//console.log(_iduser.password)
+			//res.send(check)
+		} catch(err){
+			res.send(err)
+		}
+	},
+	capnhat : async (req, res)=>{
+		try{
+			const {_iduser,ten, ngaysinh, gioitinh, email, diachi, sdt } = req.body
+			const taikhoan = await TaiKhoan.findById(_iduser)
+				taikhoan.ten = ten ? ten : taikhoan.ten
+				taikhoan.ngaysinh = ngaysinh ? ngaysinh : taikhoan.ngaysinh
+				taikhoan.gioitinh = gioitinh ? gioitinh : taikhoan.gioitinh
+				taikhoan.email = email ? email : taikhoan.email
+				taikhoan.diachi = diachi ? diachi : taikhoan.diachi
+				taikhoan.sdt = sdt ? sdt : taikhoan.sdt
+				taikhoan.save()
+			res.send([taikhoan])
+		} catch(err){
+			res.send(err)
+		}
+	},
+	lichsuthi : async (req, res) => {
+		try{
+			const { _idtaikhoan } = req.params
+			const baithis = await BaiThi.find({'sinhvien':_idtaikhoan}).populate({
+				path:'cauhois',
+				model:'CauHoi',
+				populate:{
+					path: 'phuongans',
+					model: 'PhuongAn'
+				}
+			})
+			res.send({baithis:baithis})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	uploadImage: async (req, res)=>{
+		//res.send(req.file)
+		const processedFile = req.file || {}; // MULTER xử lý và gắn đối tượng FILE vào req		
+	    let orgName = processedFile.originalname || ''; // Tên gốc trong máy tính của người upload    
+	    orgName = orgName.trim().replace(/ /g, "-")
+	    const fullPathInServ = processedFile.path; // Đường dẫn đầy đủ của file vừa đc upload lên server
+	    // Đổi tên của file vừa upload lên, vì multer đang đặt default ko có đuôi file
+	    const newFullPath = `${fullPathInServ}-${orgName}`;
+	    fs.renameSync(fullPathInServ, newFullPath);				
+		res.send(newFullPath)
+	},
+	updateUser : async (req, res)=>{
+		try{
+			const {_iduser, imageName} = req.body
+			const taikhoan = await TaiKhoan.findById(_iduser)
+				taikhoan.hinhanh = imageName
+				taikhoan.save()
+			res.send(taikhoan)
+		} catch(err){
+			res.send(err)
+		}
+	}	
 }
 
 module.exports = methods

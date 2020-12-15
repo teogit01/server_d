@@ -10,14 +10,10 @@ var schema = new Schema({
 
     cauhoi:{
 		type:Schema.Types.ObjectId,
-		ref:"Cauhoi"
+		ref:"CauHoi"
 	},
 	
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
+	trangthai: Number, // 0 cau hoi bi xoa
 })
 
 var PhuongAn = mongoose.model('PhuongAn', schema)

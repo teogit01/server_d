@@ -10,7 +10,8 @@ var schema = new Schema({
     ngaythi: String,    
     hocki: String,    
     thoigian:Number,    
-    trangthai: Number,
+    trangthai: Boolean,
+    tinhtrang: Number, // 0 da thi, 1 dang thi, 2 chua thi
  	 	
  	mon:{
 		type:Schema.Types.ObjectId,
@@ -20,12 +21,22 @@ var schema = new Schema({
 		type:Schema.Types.ObjectId,
 		ref:"DeThi"
 	}],	
-    
-	create_at: {
-		type: Date,
-		default: Date.now
+	dethidongs:[{
+		type:Schema.Types.ObjectId,
+		ref:"DeThi"
+	}],	
+	dethimos:[{
+		type:Schema.Types.ObjectId,
+		ref:"DeThi"
+	}],	
+	nhoms:[{
+		type:Schema.Types.ObjectId,
+		ref:"Nhom"
+	}],
+	giaovien:{
+		type:Schema.Types.ObjectId,
+		ref:"TaiKhoan"
 	},
-	update_at: Date
 })
 
 var KiThi = mongoose.model('KiThi', schema)

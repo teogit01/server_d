@@ -13,12 +13,7 @@ var schema = new Schema({
 		type:Schema.Types.ObjectId,
 		ref:"Nhom"
 	},
-    
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
+    	
 })
 
 var ThongBao = mongoose.model('ThongBao', schema)
