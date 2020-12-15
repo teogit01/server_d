@@ -13,7 +13,7 @@ var schema = new Schema({
  	
  	cauhois:[{
 		type:Schema.Types.ObjectId,
-		ref:"Cauhoi"
+		ref:"CauHoi"
 	}],
 
 	mon:{
@@ -24,13 +24,7 @@ var schema = new Schema({
 	kithis:[{
 		type:Schema.Types.ObjectId,
 		ref:"KiThi"
-	}],
-    
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
+	}]	
 })
 
 var DeThi = mongoose.model('DeThi', schema)

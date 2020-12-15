@@ -9,5 +9,7 @@ router.get('/nhom/:_idnhom', controllers.thongBaoCuaNhom)
 
 router.post('/them',controllers.post)
 
+router.post('/remove',controllers.remove)
+
 
 module.exports = router

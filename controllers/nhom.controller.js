@@ -6,8 +6,40 @@ var shortid = require('shortid');
 
 const methods = {
 	index: async(req, res)=>{
-		const nhoms = await Nhom.find().populate('giaoviens').populate('thongbaos')		
+		const nhoms = await Nhom.find().populate('giaoviens').populate('thongbaos')
 		res.send(nhoms)
+	},
+	detail : async (req, res)=>{
+		try{
+			const {_idnhom} = req.params
+			const nhom = await Nhom.findById(_idnhom).populate({
+				path:'sinhviens',
+				model:'TaiKhoan'
+			})
+			res.send(nhom)
+		} catch(err){
+			res.send(err)
+		}
+	},
+	giaovien : async (req, res) => {
+		try{
+			const {_idtaikhoan} = req.params
+			//res.send(_idtaikhoan)
+			const nhoms = await Nhom.find({giaoviens:_idtaikhoan}).populate('giaoviens').populate('thongbaos')
+			res.send(nhoms)
+		} catch(err){
+			res.send(err)
+		}
+	},
+	sinhvien : async (req, res) => {
+		try{
+			const {_idtaikhoan} = req.params
+			//res.send(_idtaikhoan)
+			const nhoms = await Nhom.find({sinhviens:_idtaikhoan}).populate('giaoviens').populate('thongbaos')
+			res.send(nhoms)
+		} catch(err){
+			res.send(err)
+		}
 	},
 	// nhom -> nhieu tai khoan
 	post : async (req, res) => {
@@ -22,7 +54,7 @@ const methods = {
 			})
 			nhom.save().then(async respone=>{
 				const taikhoan = await TaiKhoan.findById(giaovien)
-					taikhoan.nhoms.push(respone)
+					taikhoan.nhoms.push(respone._id)
 					taikhoan.save()
 				//res.send(respone)
 				const nhoms = await Nhom.find().populate('giaoviens')
@@ -33,47 +65,38 @@ const methods = {
 		}
 	},
 	remove : async (req, res) => {
-		try {
+		// nhom -> giaoviens
+		// nhom -> sinhviens
+		// nhom -> thongbaos
+		// nhom -> kithis
+		try {			
 			const { _idnhom } = req.params
-			const nhom = await Nhom.findById(_idnhom)	
-			if (nhom.thongbaos.length>0){
-				const thongbao = await ThongBao.deleteMany({nhom:_idnhom})
-			}
+			const nhom = await Nhom.findById(_idnhom)			
+			// if (nhom.thongbaos.length>0){
+			const thongbao = await ThongBao.deleteMany({nhom:_idnhom})
+			//}
 			// cap nhat sinh vien va giao vien
-			if (nhom.sinhviens.length>0){				
-				nhom.sinhviens.forEach( async (_idsinhvien, index)=>{
-					const taikhoan = await TaiKhoan.findById(_idsinhvien)
-						const newNhoms = taikhoan.nhoms.filter(x=> `${x}`!= _idnhom)
-							taikhoan.nhoms = newNhoms
-							taikhoan.save()
-							if(index === nhom.sinhviens.length - 1){
-								nhom.giaoviens.forEach( async (_idgiaovien, idx) =>{
-
-								const taikhoangv = await TaiKhoan.findById(_idgiaovien)
-									const newNhomsgv = taikhoangv.nhoms.filter(x=> `${x}` != _idnhom)
-									taikhoangv.nhoms = newNhomsgv
-									taikhoangv.save()
-									if (idx === nhom.giaoviens.length-1){
-										nhom.delete()
-										const nhoms = await Nhom.find().populate('giaoviens')
-										res.send(nhoms)
-									}
-							})
-						}
-				})
-			} else {				
-				nhom.giaoviens.forEach( async (_idgiaovien, idx) =>{
-					const taikhoangv = await TaiKhoan.findById(_idgiaovien)
-						const newNhomsgv = taikhoangv.nhoms.filter(x=> `${x}` != _idnhom)
-						taikhoangv.nhoms = newNhomsgv
-						taikhoangv.save()
-						if (idx === nhom.giaoviens.length-1){
-							nhom.delete()
-							const nhoms = await Nhom.find().populate('giaoviens')
-							res.send(nhoms)
-						}
-				})
-			}					
+			nhom.kithis.forEach(async _idkithi=>{
+				const kithi = await KiThi.findById(_idkithi)
+					const newNhoms = kithi.nhoms.filter(x=> `${x}` != _idnhom)
+					kithi.nhom = newNhoms
+					kithi.save()
+			})
+			nhom.sinhviens.forEach( async _idtaikhoan=>{
+				const taikhoan_sv = await TaiKhoan.findById(_idtaikhoan)
+					const newNhoms_sv = taikhoan_sv.nhoms.filter(x => `${x}`!= _idnhom)
+					taikhoan_sv.nhoms = newNhoms_sv
+					taikhoan_sv.save()
+			})
+			nhom.giaoviens.forEach( async _idtaikhoan=>{
+				const taikhoan_gv = await TaiKhoan.findById(_idtaikhoan)
+					const newNhoms_gv = taikhoan_gv.nhoms.filter(x => `${x}` != _idnhom)
+					taikhoan_gv.nhoms = newNhoms_gv
+					taikhoan_gv.save()
+			})
+			
+			nhom.delete()
+			res.end()				
 		} catch(err){
 			res.send(err)
 		}

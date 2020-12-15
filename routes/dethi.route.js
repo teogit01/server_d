@@ -5,7 +5,7 @@ import controllers from '../controllers/dethi.controller'
 
 router.get('/', controllers.index)
 
-router.get('/detail/:id', controllers.detail)
+router.get('/detail/:_iddethi', controllers.detail)
 
 // de thi cua mon
 router.get('/mon/:_idmon',controllers.testOfSubject)
@@ -13,12 +13,11 @@ router.get('/mon/:_idmon',controllers.testOfSubject)
 // router.post('/add-question/:id', controllers.addQuestion)
 router.post('/add-question', controllers.addQuestion)
 //delete
-router.post('/remove-question', controllers.removeQuestion)
+router.post('/remove-cauhoi', controllers.removeCauhoi)
 // add cau hoi
-router.post('/', controllers.post)
+router.post('/them', controllers.post)
 // delete cau  hoi
-router.delete('/:id', controllers.destroy)
-
+router.get('/remove/:_iddethi', controllers.remove)
 
 
 module.exports = router

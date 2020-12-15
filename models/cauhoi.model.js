@@ -3,13 +3,10 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
 var schema = new Schema({
-
-    ma: String,
+        
     tieude: String,
-    noidung: String,
+    noidung: String,    
     
-    loai:String,
-   
     phuongans:[{
         type:Schema.Types.ObjectId,
         ref:"PhuongAn"
@@ -23,14 +20,14 @@ var schema = new Schema({
         type:Schema.Types.ObjectId,
         ref:"DeThi"
     }],
+    baithis:[{
+        type:Schema.Types.ObjectId,
+        ref:"BaiThi"
+    }],
+    trangthai:Number, // 0 xoa, 1 ton tai...
 
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
 })
 
-var Cauhoi = mongoose.model('Cauhoi', schema)
+var CauHoi = mongoose.model('CauHoi', schema)
 
-module.exports = Cauhoi
+module.exports = CauHoi

@@ -22,12 +22,11 @@ var schema = new Schema({
 		type:Schema.Types.ObjectId,
 		ref:"ThongBao"
 	}],
+	kithis:[{
+		type:Schema.Types.ObjectId,
+		ref:"KiThi"
+	}],
     
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
 })
 
 var Nhom = mongoose.model('Nhom', schema)

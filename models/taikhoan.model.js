@@ -15,16 +15,21 @@ var schema = new Schema({
     diachi: String,
     vaitro: Number,    // 0- admin/ 1 giaovien/ 2 sinh vien
  	matkhautam:String,
- 	nhoms:[{
+    hinhanh: String,
+ 	
+    nhoms:[{
 		type:Schema.Types.ObjectId,
 		ref:"Nhom"
-	}],	
-    
-	create_at: {
-		type: Date,
-		default: Date.now
-	},
-	update_at: Date
+	}],
+    kithis:[{
+        type:Schema.Types.ObjectId,
+        ref:"KiThi"
+    }],
+    baithis:[{
+        type:Schema.Types.ObjectId,
+        ref:"BaiThi"
+    }],
+
 })
 
 var TaiKhoan = mongoose.model('TaiKhoan', schema)
