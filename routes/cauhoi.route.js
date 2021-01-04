@@ -14,6 +14,8 @@ router.get('/de-thi/:_iddethi', controllers.cauhoiCuaDethi)
 
 // {noi dung, phuongans[]}
 router.post('/them', controllers.themCauHoi)
+router.post('/mon', controllers.cauHoiCuaMon)
+router.post('/them-nhieu', controllers.themCauHoiNhieu)
 // delete cau  hoi
 router.delete('/:id', controllers.destroy)
 

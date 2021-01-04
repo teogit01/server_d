@@ -16,28 +16,27 @@ const methods = {
 	},
 	register : async (req, res) => {
 		try{					
-			const {username, password} = req.body			
-			// bcrypt.genSalt(saltRounds, function(err, salt) {
-			//     bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
-			//         console.log(hash)
-			//     });
-			// });			
-			let hash_pass = ''			
-			bcrypt.hash(password, saltRounds).then(hash=>{
-				//console.log(hash)				
-				
-				let taikhoan = new TaiKhoan({
-					maso:username,
-					matkhau:hash,
-					vaitro:1
-				})						
+			const {name, email, code} = req.body						
+			// let hash_pass = ''			
+			// bcrypt.hash(password, saltRounds).then(hash=>{
+			// 	//console.log(hash)							
+			// 	let taikhoan = new TaiKhoan({
+			// 		maso:username,
+			// 		matkhau:hash,
+			// 		vaitro:1,
+			// 		trangthai: 0 //0 _cho duyet, 1_da duyet dang hoat dong, 2_bi khoa
+			// 	})						
+			// 	taikhoan.save()
+			// })	
+			const taikhoan = await new TaiKhoan({
+				maso:code,
+				vaitro:1,
+				trangthai:0,
+				ten:name,
+				email:email
+			})	
 				taikhoan.save()
-			})
-			
-			res.send('ok')		
-			// const taikhoan = await new TaiKhoan({
-					
-			// })
+			res.send('ok')					
 					
 		} catch (err){
 			res.send(err)
@@ -45,11 +44,15 @@ const methods = {
 	},
 	login : async (req, res)=>{
 		try{
-			const {username, password} = req.body
-			const user = await TaiKhoan.find({maso:username})
+			const {code, pass} = req.body
+			if(code==='admin'&&pass==='admin'){
+				const user = await TaiKhoan.find({maso:code})
+				return res.send({checked:true,user:user})
+			}
+			const user = await TaiKhoan.find({maso:code})
 			if (user != ''){				
 				let check = false	
-				bcrypt.compare(password, user[0].matkhau).then(function(result) {
+				bcrypt.compare(pass, user[0].matkhau).then(function(result) {
     				check = result
     				if(check===true){
     					return res.send({checked:true,user:user})
@@ -77,7 +80,7 @@ const methods = {
 							item.nhoms.push(nhomActived._id)
 							item.save().then(async response=>{
 								let nhom = await Nhom.findById(nhomActived._id)
-									nhom.sinhviens.push(item._id)
+									nhom.sinhviens.push(response._id)
 									nhom.save()
 							})
 						})
@@ -94,11 +97,12 @@ const methods = {
 								matkhau:hash,
 								nhoms:nhomActived._id,
 								matkhautam:matkhautam,
-								vaitro:2
+								vaitro:2,
+								trangthai:1
 							})								
 							taikhoan.save().then(async respone=>{
 								let nhom = await Nhom.findById(nhomActived._id)
-									nhom.sinhviens.push(respone)
+									nhom.sinhviens.push(respone._id)
 									nhom.save()
 							})
 						})				
@@ -211,7 +215,169 @@ const methods = {
 		} catch(err){
 			res.send(err)
 		}
-	}	
+	},
+	capnhatGV : async (req, res)=>{
+		try{
+			const {name, email, phone, address, _idgv}=req.body
+			const taikhoan = await TaiKhoan.findById(_idgv)
+				taikhoan.ten = name ? name : taikhoan.ten
+				taikhoan.email = email ? email : taikhoan.email
+				taikhoan.sdt = phone ? phone : taikhoan.sdt
+				taikhoan.diachi = address ? address : taikhoan.diachi
+				taikhoan.save()
+			res.send({taikhoan:taikhoan})
+		}catch(err){
+			res.send(err)
+		}
+	},
+	giaovien : async (req, res)=>{
+		try{
+			const giaoviens = await TaiKhoan.find({vaitro:1})
+			res.send({giaoviens})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	sinhvien : async (req, res)=>{
+		try{
+			const sinhviens = await TaiKhoan.find({vaitro:2})
+			res.send({sinhviens})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	getGiaoVien : async (req, res)=>{
+		try{
+			const giaoviens = await TaiKhoan.find({vaitro:1}).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'sinhviens',
+					model:'TaiKhoan'
+				}
+			}).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'thongbaos',
+					model:'ThongBao'
+				}
+			}).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'kithis',
+					model:'KiThi'
+				}
+			})
+			res.send({giaoviens:giaoviens})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	chitiet : async (req, res)=>{
+		try{
+			const {_idtk}=req.body
+			const taikhoan = await TaiKhoan.findById(_idtk).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'kithis',
+					model:'KiThi',
+					populate:{
+						path:'dethis',
+						model:'DeThi',
+						populate:{
+							path:'cauhois',
+							model:'CauHoi',
+							populate:{
+								path:'phuongans',
+								model:'PhuongAn'
+							}
+						}
+					}
+				}
+			}).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'sinhviens',
+					model:'TaiKhoan'					
+				}
+			}).populate({
+				path:'nhoms',
+				model:'Nhom',
+				populate:{
+					path:'thongbaos',
+					model:'ThongBao'					
+				}
+			}).populate({
+				path:'kithis',
+				model:'KiThi',
+				populate:{
+					path:'dethis',
+					model:'DeThi'
+				}
+			}).populate({
+				path:'mons',
+				model:'Mon',
+				populate:{
+					path:'cauhois',
+					model:'CauHoi',
+					populate:{
+						path:'phuongans',
+						model:'PhuongAn'
+					}
+				}
+			}).populate({
+				path:'dethis',
+				model:'DeThi',
+				populate:{
+					path:'cauhois',
+					model:'CauHoi',
+					populate:{
+						path:'phuongans',
+						model:'PhuongAn'
+					}
+				}								
+			}).populate({
+				path:'dethis',
+				model:'DeThi',
+				populate:{
+					path:'mon',
+					model:'Mon',
+					populate:{
+						path:'cauhois',
+						model:'CauHoi',
+						populate:{
+							path:'phuongans',
+							model:'PhuongAn'
+						}
+					}
+				}								
+			})
+			res.send({result:taikhoan})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	capmatkhau : async (req, res)=>{
+		try{
+			const {_idgv} = req.body
+			const giaovien = await TaiKhoan.findById(_idgv)
+				const pass = shortid.generate()				
+				bcrypt.hash(pass, saltRounds).then(async hash=>{										
+					giaovien.matkhau = hash
+					giaovien.matkhautam = pass
+					giaovien.trangthai = 1
+					giaovien.save()
+				})	
+				res.send({pass:pass})
+
+		} catch(err){
+			res.send(err)
+		}
+	}
 }
 
 module.exports = methods

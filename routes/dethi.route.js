@@ -12,6 +12,7 @@ router.get('/mon/:_idmon',controllers.testOfSubject)
 // edit // add question to exam
 // router.post('/add-question/:id', controllers.addQuestion)
 router.post('/add-question', controllers.addQuestion)
+router.post('/mon', controllers.dethiCuaMon)
 //delete
 router.post('/remove-cauhoi', controllers.removeCauhoi)
 // add cau hoi

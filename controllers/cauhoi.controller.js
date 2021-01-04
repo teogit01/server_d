@@ -6,8 +6,8 @@ var shortid = require('shortid');
 
 const methods = {
 	index: async (req, res)=>{
-		const cauhoi = await CauHoi.find().populate('mon')
-		res.send(cauhoi)
+		const cauhois = await CauHoi.find().populate('mon').populate('phuongans')
+		res.send({cauhois:cauhois})
 	},
 
 	detail : async (req, res)=>{
@@ -83,9 +83,9 @@ const methods = {
 		}
 	},
 	// add question
-	themCauHoi: async (req, res)=>{
-		const {noidung, phuongans, _idmon} = req.body		
+	themCauHoi: async (req, res)=>{		
 		try {			
+			const {noidung, phuongans, _idmon} = req.body		
 			const cauhoi = await new CauHoi({				
 				noidung: noidung,				
 				mon:_idmon,
@@ -95,29 +95,69 @@ const methods = {
 			cauhoi.save().then(async respone=>{
 				const mon = await Mon.findById(_idmon)
 					mon.cauhois.push(respone._id)
-					mon.save()										
+					mon.save()						
+				const array = []
 				phuongans.forEach(async (pa, idx)=>{										
-					let phuongan = await new PhuongAn({
+					const phuongan = await new PhuongAn({
 						ten: pa.ten,
 						noidung: pa.noidung,
 						dapan: pa.dapan,
 						cauhoi: respone._id
 					})
-					phuongan.save().then(async (result_pa)=>{
-						respone.phuongans.push(result_pa._id)
-						respone.save()
-					})
-					if(idx === phuongans.length-1){
-						let result_cauhoi = await CauHoi.findById(respone._id).populate('phuongans')
-						let result_mon = await Mon.findById(_idmon).populate('cauhois')							
-						res.send({result_cauhoi, result_mon})
-					}									
+					phuongan.save().then(async result_pa=>{
+						array.push(result_pa._id)
+						if(idx===3){
+							respone.phuongans=array
+							respone.save().then(async result=>{
+								const result_cauhoi = await CauHoi.findById(result._id).populate('phuongans')
+								const result_mon = await Mon.findById(_idmon).populate({
+										path:'cauhois',
+										model:'CauHoi',
+										populate:{
+											path:'phuongans',
+											model:'PhuongAn'
+										}
+									})
+								res.send({cauhoi:result_cauhoi,mon:result_mon})
+							})
+
+						}
+					})																		
 				})
 			})			
 		} catch(err){
 			res.send(err)
 		}
-
+	},
+	themCauHoiNhieu : async (req,res)=>{
+		try{			
+			// data _ array lable, value:_idcauhoi
+			const {_idmon, arrCauhoi}=req.body			
+			const mon = await Mon.findById(_idmon)
+			if (arrCauhoi.length>0){				
+				const arr = []
+				arrCauhoi.forEach(cauhoi=>{
+					arr.push(cauhoi.value)
+				})				
+				//const newArray = arr.concat(mon.cauhois)
+				const newArray = mon.cauhois.concat(arr)
+				mon.cauhois = newArray
+				mon.save().then(async ()=>{
+					const result = await Mon.findById(_idmon).populate({
+						path:'cauhois',
+						model:'CauHoi',
+						populate:{
+							path:'phuongans',
+							model:'PhuongAn'
+						}
+					})
+					res.send({mon:result})
+				})
+				
+			}
+		} catch (err){
+			res.send(err)
+		}
 	},
 	// import cau hoi {_idmon, cauhois[]}
 	import : async (req, res)=>{
@@ -263,7 +303,19 @@ const methods = {
 		} catch(err){
 			res.send(err)
 		}
-	}	
+	},
+	cauHoiCuaMon : async (req,res)=>{
+		try{
+			const {_idmon}=req.body
+			const cauhois = await CauHoi.find({mon:_idmon}).populate({
+				path:'phuongans',
+				model:'PhuongAn'
+			})
+			res.send({cauhois:cauhois})
+		}catch(err){
+			res.send(err)
+		}
+	}
 }
 
 module.exports = methods

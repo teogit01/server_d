@@ -43,6 +43,8 @@ const methods = {
 	updateStatus : async (req, res)=>{
 		try{
 			const {_idkithi} = req.params
+			console.log('ok')
+			console.log(_idkithi)
 			const kithi = await KiThi.findById(_idkithi)
 				kithi.trangthai = !kithi.trangthai
 				kithi.save()
@@ -91,43 +93,43 @@ const methods = {
 		}		
 	},
 	// add ki thi
-	post: async (req, res)=>{
-        const { ma, tieude, matkhau ,dethi, ngaythi, hocki, thoigian, mon,user } = req.body        
-		const kithi = await new KiThi({
-            ma: ma,
-            tieude: tieude,            
-            matkhau:matkhau,
-            ngaythi: ngaythi,
-            hocki: hocki,
-            mon:mon,
-            thoigian:thoigian,
-            trangthai: 0,
-            tinhtrang: 2,// chua thi
-            giaovien:user._id
-		})
+	post: async (req, res)=>{        
 		try{			
-			kithi.save().then(async (respone)=>{
-				const p_kithi = await KiThi.findById(respone._id).populate({
-						path:'dethis',
-						model:'DeThi',
-						populate:{
-							path:'mon',
-							model:'Mon'
-						}
-					})
-					p_kithi.dethis.push(dethi)		
-					p_kithi.dethimos.push(dethi)					
-					p_kithi.save()
-				let p_dethi = await DeThi.findById(dethi)
-				p_dethi.kithis.push(respone._id)
-				p_dethi.save()
-
-				res.send(p_kithi)
-			})			
-		} catch(err){
-			res.json({
-				error : error 
+			const { ma, tieude, matkhau ,dethi, ngaythi, hocki, thoigian, mon, giaovien } = req.body        
+			const kithi = await new KiThi({
+	            ma: ma,
+	            tieude: tieude,            
+	            matkhau:matkhau,
+	            ngaythi: ngaythi,
+	            hocki: hocki,
+	            mon:mon,
+	            thoigian:thoigian,
+	            trangthai: 0,
+	            tinhtrang: 2,// chua thi
+	            giaovien:giaovien._id
 			})
+			kithi.save().then(async response=>{
+				const taikhoan = await TaiKhoan.findById(giaovien._id)
+			 		taikhoan.kithis.push(response._id)
+			 		taikhoan.save()
+			 	const p_mon = await Mon.findById(mon)
+			 		p_mon.kithis.push(response._id)
+			 		p_mon.save()
+			 	const result = await KiThi.findById(response._id).populate({
+			 		path:'dethis',
+			 		model:'DeThi',			 		
+			 	}).populate({
+			 		path:'mon',
+			 		model:'Mon'
+			 	}).populate({
+			 		path:'sinhviens',
+			 		model:'TaiKhoan'
+			 	})
+			 	res.send({kithi:result})
+			})			
+			
+		} catch(err){
+			res.send(err)
 		}
 	},
 	// delete cauhoi (id)
@@ -160,69 +162,119 @@ const methods = {
 	},
 	themDeThi : async (req, res)=>{
 		try{
-			const {_idkithi, _iddethi} = req.body
-			const dethi = await DeThi.findById(_iddethi)
-				dethi.kithis.push(_idkithi)
-				dethi.save()
-			const kithi = await KiThi.findById(_idkithi).populate({
-					path:'dethis',
-					model:'DeThi',
-					populate:{
-						path:'mon',
-						model:'Mon'
-					}
+			// dethis value label
+			const {_idkithi, dethis} = req.body
+			if(dethis.length>0){
+				const kithi = await KiThi.findById(_idkithi)
+					const newDethis = kithi.dethis
+					dethis.forEach(async (item,index)=>{
+						newDethis.push(item.value)
+						if(index === dethis.length-1){
+							kithi.dethis = newDethis
+							kithi.save()
+						}
+					})					
+
+				dethis.forEach(async (dt,idx)=>{
+					const de = await DeThi.findById(dt.value)
+						de.kithis.push(_idkithi)
+						de.save().then(async ()=>{
+							if (idx === dethis.length-1){
+
+								const result = await KiThi.findById(_idkithi).populate('mon').populate({
+									path:'nhoms',
+									model:'Nhom'
+								}).populate({
+									path:'dethis',
+									model:'DeThi'
+								})
+								res.send({kithi:result})
+							}
+						})
 				})
-				kithi.dethis.push(_iddethi)
-				kithi.dethimos.push(_iddethi)
-				kithi.save()
-			res.send(kithi)
+			}
+			// moi de thi pish ki thi			
 		} catch(err){
 			res.send(err)
 		}
 	},
 	themNhom : async (req, res)=>{
 		try{
-			const {_idkithi, _idnhom} = req.body
-			
-			const nhom = await Nhom.findById(_idnhom)
-				nhom.kithis.push(_idkithi)
-				nhom.save()
-			
-			const kithi = await KiThi.findById(_idkithi).populate({
-					path:'dethis',
-					model:'DeThi',
-					populate:{
-						path:'mon',
-						model:'Mon'
-					}
-				}).populate({
-					path:'nhoms',
-					model:'Nhom',
-					populate:{
-						path:'sinhviens',
-						model:'TaiKhoan'
-					}
-				})
+			const {_idkithi, nhoms} = req.body
+			const kithi = await KiThi.findById(_idkithi)
+				const newNhoms = kithi.nhoms
+			if (nhoms.length>0){
+				nhoms.forEach(async (item,idx)=>{
+					const nhom = await Nhom.findById(item.value)					
+						nhom.kithis.push(_idkithi)
+						newNhoms.push(item.value)
+						nhom.save().then(async ()=>{
+							if(idx===nhoms.length-1){
+								kithi.nhoms = newNhoms
+								kithi.save().then(async ()=>{
+									const kithi_result = await KiThi.findById(_idkithi).populate({
+										path:'dethis',
+										model:'DeThi',
+										populate:{
+											path:'mon',
+											model:'Mon'
+											}
+										}).populate({
+											path:'nhoms',
+											model:'Nhom',
+											populate:{
+												path:'sinhviens',
+												model:'TaiKhoan'
+											}
+										})	
+										res.send({kithi:kithi_result})
+									})
 
-				kithi.nhoms.push(_idnhom)
-				kithi.save().then(async ()=>{
-					const kithi_result = await KiThi.findById(_idkithi).populate({
-					path:'dethis',
-					model:'DeThi',
-					populate:{
-						path:'mon',
-						model:'Mon'
-						}
-					}).populate({
-						path:'nhoms',
-						model:'Nhom',
-						populate:{
-							path:'sinhviens',
-							model:'TaiKhoan'
-						}
-					})	
-					res.send(kithi_result)
-				})		
+								}
+							})
+						})
+					}
+
+			
+			// const nhom = await Nhom.findById(_idnhom)
+			// 	nhom.kithis.push(_idkithi)
+			// 	nhom.save()
+			
+			// const kithi = await KiThi.findById(_idkithi).populate({
+			// 		path:'dethis',
+			// 		model:'DeThi',
+			// 		populate:{
+			// 			path:'mon',
+			// 			model:'Mon'
+			// 		}
+			// 	}).populate({
+			// 		path:'nhoms',
+			// 		model:'Nhom',
+			// 		populate:{
+			// 			path:'sinhviens',
+			// 			model:'TaiKhoan'
+			// 		}
+			// 	})
+
+			// 	kithi.nhoms.push(_idnhom)
+			// 	kithi.save().then(async ()=>{
+			// 		const kithi_result = await KiThi.findById(_idkithi).populate({
+			// 		path:'dethis',
+			// 		model:'DeThi',
+			// 		populate:{
+			// 			path:'mon',
+			// 			model:'Mon'
+			// 			}
+			// 		}).populate({
+			// 			path:'nhoms',
+			// 			model:'Nhom',
+			// 			populate:{
+			// 				path:'sinhviens',
+			// 				model:'TaiKhoan'
+			// 			}
+			// 		})	
+			// 		res.send(kithi_result)
+				// })		
 		} catch(err){
 			res.send(err)
 		}
@@ -312,6 +364,44 @@ const methods = {
 				kithi.tinhtrang = tinhtrang
 				kithi.save()
 			res.send(kithi)
+		} catch(err){
+			res.send(err)
+		}
+	},
+	search : async (req, res) =>{
+		try{
+			const {key} = req.body
+			const kithi = await KiThi.find()
+		} catch (err){
+			res.send(err)
+		}
+	},
+	kithiCuaGV : async (req, res)=>{
+		try{
+			const {_idgv} = req.body
+			const giaovien = await TaiKhoan.findById(_idgv).populate({
+				path:'kithis',
+				model:'KiThi',
+				populate:{
+					path:'dethis',
+					model:'DeThi'
+				}
+			}).populate({
+				path:'kithis',
+				model:'KiThi',
+				populate:{
+					path:'nhoms',
+					model:'Nhom'
+				}
+			}).populate({
+				path:'kithis',
+				model:'KiThi',
+				populate:{
+					path:'mon',
+					model:'Mon'
+				}
+			})
+			res.send({giaovien:giaovien})
 		} catch(err){
 			res.send(err)
 		}

@@ -15,6 +15,14 @@ var schema = new Schema({
 		type:Schema.Types.ObjectId,
 		ref:"DeThi"
 	}],
+	kithis:[{
+		type:Schema.Types.ObjectId,
+		ref:"KiThi"
+	}],
+	giaovien:{
+		type:Schema.Types.ObjectId,
+		ref:"TaiKhoan"
+	},
     
 })
 

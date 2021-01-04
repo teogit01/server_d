@@ -32,7 +32,7 @@ const methods = {
 					nhom.thongbaos.push(respone._id)
 					nhom.save().then(async ()=>{
 						const thongbaos = await ThongBao.find({'nhom':_idnhom})			
-						res.send(thongbaos)
+						res.send({thongbaos:thongbaos})
 					})
 			})			
 		} catch(err){

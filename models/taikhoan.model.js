@@ -16,6 +16,7 @@ var schema = new Schema({
     vaitro: Number,    // 0- admin/ 1 giaovien/ 2 sinh vien
  	matkhautam:String,
     hinhanh: String,
+    trangthai:Number, // 0- cho admin duyet, 1- dang hoat dong, 2- bi khoa
  	
     nhoms:[{
 		type:Schema.Types.ObjectId,
@@ -28,6 +29,14 @@ var schema = new Schema({
     baithis:[{
         type:Schema.Types.ObjectId,
         ref:"BaiThi"
+    }],
+    mons:[{
+        type:Schema.Types.ObjectId,
+        ref:"Mon"
+    }],
+    dethis:[{
+        type:Schema.Types.ObjectId,
+        ref:"DeThi"
     }],
 
 })

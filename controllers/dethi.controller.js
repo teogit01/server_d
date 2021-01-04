@@ -2,12 +2,20 @@ let DeThi = require('../models/dethi.model')
 let Mon = require('../models/mon.model')
 let CauHoi = require('../models/cauhoi.model')
 let KiThi = require('../models/kithi.model')
+let TaiKhoan = require('../models/taikhoan.model')
 var shortid = require('shortid');
 
 const methods = {
 	index: async(req, res)=>{
-		const dethi = await DeThi.find().populate('mon')
-		res.send(dethi)
+		const dethis = await DeThi.find().populate('mon').populate({
+			path:'cauhois',
+			model:'CauHoi',
+			populate:{
+				path:'phuongans',
+				model:'PhuongAn'
+			}
+		}).populate('mon')
+		res.send({dethis:dethis})
 	},
 	detail: async(req, res)=>{
 		try{
@@ -50,8 +58,26 @@ const methods = {
 						cauhoi.save()	
 
 					if (idx === cauhois.length-1){
-						const result_dethi = await DeThi.findById(_iddethi).populate('mon')						
-						res.send({result_dethi})
+						const result_dethi = await DeThi.findById(_iddethi).populate({
+							path:'mon',
+							model:'Mon',
+							populate:{
+								path:'cauhois',
+								model:'CauHoi',
+								populate:{
+									path:'phuongans',
+									model:'PhuongAn'
+								}
+							}
+						}).populate({
+							path:'cauhois',
+							model:'CauHoi',
+							populate:{
+								path:'phuongans',
+								model:'PhuongAn'
+							}
+						})					
+						res.send({dethi:result_dethi})
 					}					
 				})
 			}			
@@ -96,8 +122,8 @@ const methods = {
 		}			
 	},
 	// create De Thi
-	post: async(req, res)=>{        		
-        let { ma, thoigian, namhoc, tieude, ghichu, mon} = req.body               
+	post: async (req, res)=>{        		
+        let { ma, thoigian, namhoc, tieude, ghichu, mon, _iduser} = req.body               
 		const dethi = new DeThi({
 			ma: ma,
 			tieude:tieude,
@@ -106,6 +132,7 @@ const methods = {
 			ghichu: ghichu,
 			mon:mon,
 			trangthai: 0,
+			taikhoan:_iduser
 		})
 		try{					
 			dethi.save().then( async (respone)=>{
@@ -113,8 +140,18 @@ const methods = {
 				let p_mon = await Mon.findById(mon)
 					p_mon.dethis.push(respone._id)
 					p_mon.save()
-				const dethi_result = await DeThi.findById(respone._id).populate('mon')
-				res.send(dethi_result)
+				const dethi_result = await DeThi.findById(respone._id).populate('mon').populate({
+						path:'cauhois',
+						model:'CauHoi',
+						populate:{
+							path:'phuongans',
+							model:'PhuongAn'
+						}
+					}).populate('mon')
+				const taikhoan = await TaiKhoan.findById(_iduser)
+					taikhoan.dethis.push(respone._id)
+					taikhoan.save()
+				res.send({dethi:dethi_result})
 			})
 						
 		} catch(err){
@@ -156,6 +193,15 @@ const methods = {
 			res.send(err)
 		}
 		//res.send(user)
+	},
+	dethiCuaMon : async (req, res)=>{
+		try{
+			const {_idmon}=req.body
+			const dethis = await DeThi.find({mon:_idmon})
+			res.send({dethis:dethis})
+		} catch(err){
+			res.send(err)
+		}
 	}
 }
 

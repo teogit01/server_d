@@ -16,9 +16,14 @@ router.post('/changepassword', controllers.doiMatKhau)
 
 // tao danh sach sinh vien import 
 router.post('/create', controllers.createStudent)
+router.post('/capnhat-gv', controllers.capnhatGV)
+
+router.get('/giao-vien', controllers.getGiaoVien)
+router.post('/chi-tiet', controllers.chitiet)
 
 // cap nhat tai khoan
 router.post('/cap-nhat', controllers.capnhat)
+router.post('/cap-mat-khau', controllers.capmatkhau)
 // lich su thi cua  tai khoan
 router.get('/lich-su-thi/:_idtaikhoan', controllers.lichsuthi)
 
@@ -30,7 +35,8 @@ router.post('/update-user', controllers.updateUser)
 router.get('/nhom/:_idnhom', controllers.taiKhoanCuaNhom)
 // delete loai lop
 //router.delete('/:id', controllers.destroy)
-
+router.get('/giao-vien', controllers.giaovien)
+router.get('/sinh-vien', controllers.sinhvien)
 
 
 module.exports = router

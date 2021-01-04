@@ -1,24 +1,37 @@
 let Mon = require('../models/mon.model')
 let CauHoi = require('../models/cauhoi.model')
+let TaiKhoan = require('../models/taikhoan.model')
 let DeThi = require('../models/dethi.model')
 var shortid = require('shortid');
 
 const methods = {
 	index: async(req, res)=>{		
-		const mon = await Mon.find().populate('cauhois')
-		res.send(mon)
+		const mons = await Mon.find().populate({
+			path:'cauhois',
+			model:'CauHoi',
+			populate:{
+				path:'phuongans',
+				model:'PhuongAn'
+			}
+		})
+		res.send({mons:mons})
 	},
 	// add mon
-	post: async (req, res)=>{        
+	add: async (req, res)=>{        
 		try{	
-			let { ma, ten } = req.body        	        
+			const { ma, ten, _iduser } = req.body        	        
 			const mon = new Mon({
 	            ma: ma,
-	            ten: ten,                             
+	            ten: ten,
+	            giaovien:_iduser                             
 			})		
-			mon.save().then(respone =>{
-				res.send(respone)
-			})			
+			mon.save().then( async response=>{
+				const taikhoan = await TaiKhoan.findById(_iduser)
+					taikhoan.mons.push(response._id)
+					taikhoan.save()
+				res.send({mon:mon})
+			})
+					
 		} catch(err){
 			res.send(err)
 		}
@@ -35,6 +48,31 @@ const methods = {
 			// delete mon trong de thi
 			const dethi = await DeThi.deleteMany({'mon':_idmon})			
 			res.end()
+		} catch(err){
+			res.send(err)
+		}
+	},
+	chitiet : async (req, res)=>{
+		try{
+			const {_idmon}=req.body
+			const mon = await Mon.findById(_idmon).populate({
+				path:'cauhois',
+				model:'CauHoi',
+				populate:{
+					path:'phuongans',
+					model:'PhuongAn'
+				}
+			})
+			res.send({mon:mon})
+		} catch(err){
+			res.send(err)
+		}
+	},
+	mongiaovien : async (req,res)=>{
+		try{
+			const {_idgv} = req.body
+			const mons = await Mon.find({giaovien:_idgv})
+			res.send({mons:mons})
 		} catch(err){
 			res.send(err)
 		}

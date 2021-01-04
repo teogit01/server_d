@@ -24,7 +24,11 @@ var schema = new Schema({
 	kithis:[{
 		type:Schema.Types.ObjectId,
 		ref:"KiThi"
-	}]	
+	}],
+	taikhoan:{
+		type:Schema.Types.ObjectId,
+		ref:"TaiKhoan"
+	}	
 })
 
 var DeThi = mongoose.model('DeThi', schema)

@@ -9,6 +9,7 @@ router.get('/giao-vien/:_idtaikhoan', controllers.giaovien)
 router.get('/sinh-vien/:_idtaikhoan', controllers.sinhvien)
 // add nhom
 router.post('/add', controllers.post)
+router.post('/giao-vien', controllers.nhomGiaoVien)
 router.get('/detail/:_idnhom', controllers.detail)
 // delete loai lop
 //router.delete('/:id', controllers.destroy)

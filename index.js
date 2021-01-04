@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const nodemailer = require('nodemailer')
+
 const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
