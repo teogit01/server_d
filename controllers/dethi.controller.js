@@ -164,7 +164,7 @@ const methods = {
 	remove: async (req, res)=>{		
 	//mon, kithis, cauhois		
 		try{
-			const {_iddethi} = req.params
+			const {_iddethi, _iduser} = req.body
 			const dethi = await DeThi.findById(_iddethi)
 				
 			if (dethi.cauhois.length>0){
@@ -183,6 +183,10 @@ const methods = {
 						each_kithi.save()
 				})
 			}
+			const taikhoan = await TaiKhoan.findById(_iduser)
+				const newDethis = taikhoan.dethis.filter(x => `${x}` !== _iddethi)
+				taikhoan.dethis = newDethis
+				taikhoan.save()
 			const mon = await Mon.findById(dethi.mon)
 				let newDethis_mon = mon.dethis.filter(x=> `${x}` != _iddethi)
 					mon.dethis = newDethis_mon

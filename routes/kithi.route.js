@@ -17,7 +17,7 @@ router.post('/giao-vien/', controllers.kithiCuaGV)
 // add ki thi
 router.post('/them', controllers.post)
 // delete cau  hoi
-router.delete('/remove/:_idkithi', controllers.destroy)
+router.post('/remove', controllers.destroy)
 
 // them de thi cho ki thi
 router.post('/them-de', controllers.themDeThi)

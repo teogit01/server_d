@@ -10,7 +10,7 @@ router.post('/add', controllers.add)
 router.post('/chi-tiet', controllers.chitiet)
 router.post('/giao-vien', controllers.mongiaovien)
 // delete loai cau  hoi
-router.get('/remove/:_idmon', controllers.remove)
+router.post('/remove', controllers.remove)
 
 
 

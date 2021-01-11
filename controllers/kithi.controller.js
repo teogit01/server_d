@@ -134,8 +134,12 @@ const methods = {
 	},
 	// delete cauhoi (id)
 	destroy: async (req, res)=>{
-		const {_idkithi} = req.params		
-		try{			
+		const {_idkithi, _iduser} = req.body
+		try{		
+			const taikhoan = await TaiKhoan.findById(_iduser)	
+				const newKithis = taikhoan.kithis.filter(x=>`${x}` !== _idkithi)
+				taikhoan.kithis = newKithis
+				taikhoan.save()
 			const kithi = await KiThi.findById(_idkithi)
 				if(kithi.dethis.length > 0){
 					kithi.dethis.forEach( async item=>{

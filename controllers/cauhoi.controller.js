@@ -261,19 +261,19 @@ const methods = {
 		//res.send(user)
 	},
 	removeCauHoi: async (req, res)=>{
-		const {_idcauhoi, _idmon} = req.body
+		const {ch} = req.body
 
 		try{
-			const cauhoi = await CauHoi.findById(_idcauhoi)
-			const mon = await Mon.findById(cauhoi.mon)
-				let newCauhois = mon.cauhois.filter(x=> `${x}`!==_idcauhoi)
+			const cauhoi = await CauHoi.findById(ch._id)
+			const mon = await Mon.findById(ch.mon)
+				let newCauhois = mon.cauhois.filter(x=> `${x}`!==ch.mon)
 				mon.cauhois = newCauhois
 				mon.save()
 
 			// de thi
 				cauhoi.dethis.forEach(async (dt, idx)=>{
 					let dethi = await DeThi.findById(dt)
-					let newCauhoiDeThi = dethi.cauhois.filter(x=> `${x}`!== _idcauhoi)
+					let newCauhoiDeThi = dethi.cauhois.filter(x=> `${x}`!== ch._id)
 						dethi.cauhois = newCauhoiDeThi
 						dethi.save()
 
@@ -284,10 +284,10 @@ const methods = {
 			// phuong an				
 				
 				if (cauhoi.baithis.length === 0){
-					let phuongan = await PhuongAn.deleteMany({cauhoi:_idcauhoi})
+					let phuongan = await PhuongAn.deleteMany({cauhoi:ch._id})
 					cauhoi.delete()					
 				} else {
-					let phuongans = await PhuongAn.find({cauhoi:_idcauhoi})
+					let phuongans = await PhuongAn.find({cauhoi:ch._id})
 						phuongans.forEach(async phuongan=>{
 							phuongan.trangthai = 0
 							phuongan.save()
@@ -296,8 +296,8 @@ const methods = {
 					cauhoi.save()
 				}
 				
-				const result_mon = await Mon.findById(_idmon).populate('cauhois') 
-				res.send({result_mon})
+				const result_mon = await Mon.findById(ch.mon).populate('cauhois') 
+				res.send({mon:result_mon})
 								
 
 		} catch(err){

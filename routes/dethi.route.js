@@ -18,7 +18,7 @@ router.post('/remove-cauhoi', controllers.removeCauhoi)
 // add cau hoi
 router.post('/them', controllers.post)
 // delete cau  hoi
-router.get('/remove/:_iddethi', controllers.remove)
+router.post('/remove', controllers.remove)
 
 
 module.exports = router

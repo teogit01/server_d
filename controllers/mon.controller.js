@@ -29,7 +29,7 @@ const methods = {
 				const taikhoan = await TaiKhoan.findById(_iduser)
 					taikhoan.mons.push(response._id)
 					taikhoan.save()
-				res.send({mon:mon})
+				res.send({mon:response})
 			})
 					
 		} catch(err){
@@ -40,14 +40,19 @@ const methods = {
 	// delete loaicauhoi (id)
 	remove: async (req, res)=>{
 		try{
-			const {_idmon} = req.params			
+			const {_idmon, _iduser} = req.body						
 			const mon = await Mon.findById(_idmon)
 				mon.delete()				
 			//delete all cau hoi cua mon
 			const cauhoi = await CauHoi.deleteMany({'mon':_idmon})
 			// delete mon trong de thi
-			const dethi = await DeThi.deleteMany({'mon':_idmon})			
-			res.end()
+			const dethi = await DeThi.deleteMany({'mon':_idmon})
+			// 
+			const taikhoan = await TaiKhoan.findById(_iduser)
+				const newMons = taikhoan.mons.filter(x=>`${x}` !== _idmon)
+				taikhoan.mons = newMons			
+				taikhoan.save()
+				res.end()
 		} catch(err){
 			res.send(err)
 		}
